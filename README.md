@@ -7,7 +7,7 @@ Esse projeto foi desenvolvido, como estudo na criação de uma API para autentic
 | :sparkles: Nome        | **API Autenticação**
 | :label: Tecnologias | NodeJs, Javascript, Express, bcrypt, JWT
 
-![](https://i.imgur.com/L3zu4To.png)
+![](https://i.imgur.com/L3zu4To.png#vitrinedev)
 
 ## Detalhes do projeto
 API possui:
