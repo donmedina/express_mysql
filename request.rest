@@ -1,0 +1,11 @@
+GET http://localhost:3000/usuarios
+
+######
+
+POST http://localhost:3000/autenticar
+Content-Type: 'application/json'
+
+{
+    "usuario" : "medina",
+    "senha": "12345"
+}
