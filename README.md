@@ -17,3 +17,6 @@ API possui:
 - Uma rota de listagemd e usuarios, para listar os usuarios é preciso estar autenticado. Esta rota retornará os ids e usuarios.
 
 Todas as variaveis importantes são armazenadas em variaveis de ambiente utilizando o arquivo .env e a biblioteca dotenv.
+
+## Proximas implementações
+Utilizar OpenSSL e HTTPS para proteger os dados trafegados pela API.
