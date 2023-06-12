@@ -12,25 +12,44 @@ class UsuariosController {
         jwt.verify(token, process.env.SECRET_KEY, (err, decode) => {
             if (err)
                 return res.status(401).end();
-            
+
             req.userId = decode.userId;
             next();
         });
     }
 
-    static verifyPermission (req, res, next){
+    static verifyPermission(req, res, next) {
         const userID = req.userId;
         const qSQL = "select acesso from usuarios where id = ?";
 
         try {
             conexao.connect();
-            conexao.query(qSQL, userID, (err, result)=>{
+            conexao.query(qSQL, userID, (err, result) => {
                 const permissao = result[0]['acesso'];
-                if ( permissao === "total"){
+                if (permissao === process.env.CREATE_USER_PERMISSION) {
                     next();
-                }else{
-                    return res.status(401).end(); 
+                } else {
+                    return res.status(401).end();
                 }
+            })
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+    static verifyExistUsuer(req, res, next) {
+        const userID = req.body.id;
+        const qSQL = "select * from usuarios where id = ?";
+
+        try {
+            conexao.connect();
+            conexao.query(qSQL, userID, async (err, result) => {
+                if (err)
+                    return res.status(401).json({"erro": err}).end();
+
+                if (result <= 0)
+                    return res.status(400).json({ "mensagem": "Usuário não localizado" }).end();
+                next();
             })
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -69,6 +88,24 @@ class UsuariosController {
             res.status(500).json({ message: err.message });
         }
 
+    }
+
+    static deleteUser = async (req, res) => {
+        const id = req.body.id
+        const qSQL = "delete from usuarios where id = ?"
+
+        try {
+            conexao.connect();
+            conexao.query(qSQL, id, (err, result) => {
+                if (err) {
+                    res.status(400).json({ message: `Não foi possivel excluir o usuário - ${err.message}` });
+                } else {
+                    res.status(200).json({ message: 'Usuário excluído com sucesso.' });
+                }
+            })
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
     }
 
     static authUser = async (req, res) => {
