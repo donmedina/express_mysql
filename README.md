@@ -19,5 +19,4 @@ API possui:
 Todas as variaveis importantes são armazenadas em variaveis de ambiente utilizando o arquivo .env e a biblioteca dotenv.
 
 ## Proximas implementações
-- Criar a rota para excluir um usuario com verificação de autenticação e permissão;
 - Utilizar OpenSSL e HTTPS para proteger os dados trafegados pela API.
