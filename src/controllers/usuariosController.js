@@ -2,13 +2,14 @@ import conexao from "../config/dbconnect.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
 class UsuariosController {
 
     static verifyJWT(req, res, next) {
-        const token = req.headers['x-access-token'];
+        const token = req.cookies.token;
         jwt.verify(token, process.env.SECRET_KEY, (err, decode) => {
             if (err)
                 return res.status(401).end();
@@ -45,7 +46,7 @@ class UsuariosController {
             conexao.connect();
             conexao.query(qSQL, userID, async (err, result) => {
                 if (err)
-                    return res.status(401).json({"erro": err}).end();
+                    return res.status(401).json({ "erro": err }).end();
 
                 if (result <= 0)
                     return res.status(400).json({ "mensagem": "Usuário não localizado" }).end();
@@ -124,7 +125,13 @@ class UsuariosController {
                     return res.status(401).json({ 'mensagem': 'Usuario ou senha inválido(s).' });
 
                 const token = jwt.sign({ userId: result[0]['id'] }, process.env.SECRET_KEY, { expiresIn: 300 })
-                res.status(202).json({ auth: true, token });
+                res.cookie("token", token, {
+                    httpOnly: true,
+                    // signed: true,
+                    // secure: true,
+                    maxAge: 300000
+                });
+                res.status(202).json({ auth: true});
 
             })
         } catch (error) {
