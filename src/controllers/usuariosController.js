@@ -6,24 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
 
-function verifyUUID(id) {
-    const qSQL = "select id from usuarios where id = ?"
-    conexao.connect();
-    const resultado = conexao.query(qSQL, id, (err, result) => {
-        if (err || result > 0) {
-            return false;
-        } else {
-            return true;
-        }
-    });
-    
-    if (resultado){
-        console.log('true')
-    }else{
-        console.log('false')
-    }
-    return resultado;
-}
 
 class UsuariosController {
 
@@ -76,6 +58,25 @@ class UsuariosController {
         }
     }
 
+    static verifyUUID(req, res, next) {
+        const idUUID = uuidv4();
+        const qSQL = "select id from usuarios where id = ?"
+        try {
+            conexao.connect();
+            conexao.query(qSQL, idUUID, (err, result) => {
+                if (err || result > 0) {
+                    return res.status(401).json({ "erro": err }).end();
+                } else {
+                    req.idUUID = idUUID;
+                    next();
+                }
+            });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    
+    }
+
     static listarUsuarios = (_, res) => {
         const querySql = "select id, nome, usuario from usuarios";
 
@@ -93,16 +94,12 @@ class UsuariosController {
         const { nome, usuario, senha, acesso } = req.body;
         const hash = await bcrypt.hash(senha, 10);
         const senhaHash = hash;
-        const idUUID = uuidv4();
-
-        const validityUUID = verifyUUID(idUUID);
-
-        console.log("verificação de uuid " + validityUUID)
         const qSQL = "insert into usuarios (id, nome, usuario, senha, acesso) values (?,?,?,?,?)"
-
+        const id = req.idUUID
+        
         try {
             conexao.connect();
-            conexao.query(qSQL, [idUUID, nome, usuario, senhaHash, acesso], (err, result) => {
+            conexao.query(qSQL, [id, nome, usuario, senhaHash, acesso], (err, result) => {
                 if (err) {
                     res.status(400).json({ message: `Não foi possivel criar o usuário - ${err.message}` });
                 } else {

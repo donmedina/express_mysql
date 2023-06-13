@@ -12,6 +12,7 @@ routesUsuarios
     .post('/cadastrar',
         UsuariosController.verifyJWT,
         UsuariosController.verifyPermission,
+        UsuariosController.verifyUUID,
         UsuariosController.createUser)
     .post('/deletar',
         UsuariosController.verifyJWT,
