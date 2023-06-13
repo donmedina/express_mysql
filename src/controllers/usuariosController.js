@@ -2,9 +2,28 @@ import conexao from "../config/dbconnect.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import cookieParser from "cookie-parser";
+import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
+
+function verifyUUID(id) {
+    const qSQL = "select id from usuarios where id = ?"
+    conexao.connect();
+    const resultado = conexao.query(qSQL, id, (err, result) => {
+        if (err || result > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    });
+    
+    if (resultado){
+        console.log('true')
+    }else{
+        console.log('false')
+    }
+    return resultado;
+}
 
 class UsuariosController {
 
@@ -74,11 +93,16 @@ class UsuariosController {
         const { nome, usuario, senha, acesso } = req.body;
         const hash = await bcrypt.hash(senha, 10);
         const senhaHash = hash;
-        const qSQL = "insert into usuarios (nome, usuario, senha, acesso) values (?,?,?,?)"
+        const idUUID = uuidv4();
+
+        const validityUUID = verifyUUID(idUUID);
+
+        console.log("verificação de uuid " + validityUUID)
+        const qSQL = "insert into usuarios (id, nome, usuario, senha, acesso) values (?,?,?,?,?)"
 
         try {
             conexao.connect();
-            conexao.query(qSQL, [nome, usuario, senhaHash, acesso], (err, result) => {
+            conexao.query(qSQL, [idUUID, nome, usuario, senhaHash, acesso], (err, result) => {
                 if (err) {
                     res.status(400).json({ message: `Não foi possivel criar o usuário - ${err.message}` });
                 } else {
@@ -131,7 +155,7 @@ class UsuariosController {
                     // secure: true,
                     maxAge: 300000
                 });
-                res.status(202).json({ auth: true});
+                res.status(202).json({ auth: true });
 
             })
         } catch (error) {
