@@ -9,6 +9,7 @@ dotenv.config();
 
 class UsuariosController {
 
+    //Middlewares
     static verifyJWT(req, res, next) {
         const token = req.cookies.token;
         jwt.verify(token, process.env.SECRET_KEY, (err, decode) => {
@@ -77,6 +78,7 @@ class UsuariosController {
     
     }
 
+    //Rotas
     static listarUsuarios = (_, res) => {
         const querySql = "select id, nome, usuario from usuarios";
 
