@@ -151,10 +151,11 @@ class UsuariosController {
                 res.cookie("token", token, {
                     httpOnly: true,
                     // signed: true,
-                    // secure: true,
+                    secure: true,
                     maxAge: 300000
                 });
-                res.status(202).json({ auth: true });
+                
+                res.status(202).json({ 'auth': true });
 
             })
         } catch (error) {
